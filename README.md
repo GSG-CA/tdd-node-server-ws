@@ -218,7 +218,7 @@ Next, find a partner that you haven't worked with before. Use TDD and the ping-p
 
 | Exercises  | URL              | Headers              | Body  | Status Code | Response Body |
 |:-----------:|:-----------------:|:--------------------:| -----:|------------:|--------------:|
-|   1        | `GET /elephants`  | N/A                  | N/A   | `404`         |`'unknwn uri'`|
+|   1        | `GET /elephants`  | N/A                  | N/A   | `404`         |`'unknown uri'`|
 |    2      | `GET /blog`       | N/A                  | N/A   | `200`        | `["one", "two", "three"]` |
 |     3     | `POST /blog`      | `{ password: potato}`|`['a','b']`  | `200`         | `['a','b']`|
 |     4     | `POST /blog`      | N/A                  | N/A   | `403`         | `'Forbidden'` |

@@ -3,8 +3,7 @@ const supertest = require('supertest');
 
 test('Initialise', () => {
   let num = 2;
-  t.equal(num, 2, 'Should return 2');
-  t.end();
+  expect(num).toBe(2);
 })
 
 test('Home route', (done) => {

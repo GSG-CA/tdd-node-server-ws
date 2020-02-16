@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "solution": "node solutions-final/test.js | tap-spec"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",

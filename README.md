@@ -1,4 +1,4 @@
-# Test Driven Development Server with Tape and Supertest
+# Test Driven Development Server with Jest and Supertest
  ## IMPORTANT! Do NOT clone this repo!
  Repeat: DO NOT CLONE! This whole repo IS the solution to the challenge, so please read below for further instructions :wink:
 
@@ -7,13 +7,13 @@ To understand the potential of faking requests to your server for the purposes o
 
 ## Tools
 
-### Tape
-[Tape](https://github.com/substack/tape) is an `npm module` used for testing server side code written in Node.js. This workshop will demonstrate using tape results piped through the  [tape-spec module](https://github.com/scottcorgan/tap-spec) to [prettify the test response output](https://github.com/substack/tape#things-that-go-well-with-tape)
+### Jest
+[Jest](https://jestjs.io/) is a `testing framework`
 
 ### Supertest
 [Supertest](https://github.com/visionmedia/supertest) is used in this workshop to simulate fake server requests *without* the need to have the server listening via a socket connection to respond to the requests. Fake requests are simply objects passed to your routes;
 ```javascript
-test('route', (t) => {
+test('route', (done) => {
     supertest(router)
         .post("/")
         .send(['a', 'b']) // to send a payload
@@ -21,8 +21,8 @@ test('route', (t) => {
         .expect(200)
         .expect('Content-Type', 'application/json')
         .end((err, res) => {
-            t.error(err)
-            t.end();
+            if(err) return done(err);
+            else done();
         });
 });
 ```
@@ -64,28 +64,21 @@ $ npm install tape supertest tap-spec --save-dev
 ```
 $ touch test.js
 ```
-- Inside `test.js`, require tape and supertest;
+- Inside `test.js`, require supertest;
 ```javascript
-const test = require('tape');
 const supertest = require('supertest');
 ```
-- Write a test to ensure tape is working;
+- Write a test to ensure Jest is working;
 ```javascript
-test('Initialise', (t) => {
+test('Initialise', () => {
   let num = 2
-  t.equal(num, 2, 'Should return 2');
-  t.end(); // Remember to call t.end() after every test call, to ensure tests run in order. You can also investigate t.plan() in the docs
+  expect(num).toBe(2);
 })
 ```
-- Edit the test script in your package.json file
-```
-"scripts": {
-  "test": "node test.js | tap-spec"
-}
-```
+- Edit the test script in your package.json file so you can run the tests
+
 - Run `npm test` in the terminal to check the test is passing-
 
-![test-1](./docs/test-1.png)
 - You're going to start by testing your routes, so create a router file
 ```
 $ touch router.js
@@ -97,13 +90,13 @@ const router = require('./router'); // remember: relative paths are needed for l
 - Now let's create a failing test to check your `router.js` logic. Start by describing what you are testing
 ```javascript
 // Home Route
-test('Home route returns a status code of 200', (t) => {
+test('Home route returns a status code of 200', done => {
 })
 ```
 - Supertest is given the argument of ```router```. We then define the type of request (here we are saying we want to make a `GET` request to the home route `'/'` and the content type), and end with a callback function with the error and response.
 ```javascript
 // Home Route
-test('Home route returns a status code of 200', (t) => {
+test('Home route returns a status code of 200', done => {
     supertest(router)
         .get("/")
         .expect(200)
@@ -117,15 +110,16 @@ test('Home route returns a status code of 200', (t) => {
 - In this callback, we  want to check the `status code` of the response in the form of res.statusCode.
 ```javascript
 // Home Route
-test('Home route returns a status code of 200', (t) => {
+test('Home route returns a status code of 200', (done) => {
+  expect.assertions(1);
     supertest(router)
         .get("/")
         .expect(200)
         .expect('Content-Type', /html/)
         .end((err, res) => {
-            t.error(err);
-            t.equal(res.statusCode, 200, 'Should return 200'); // note we have used .expect(200) above so this assertion is not neccesary. This is to show you how to check the statusCode in the res.
-            t.end();
+            if(err) return done(err);
+            expect(res.statusCode).toBe(200); // note we have used .expect(200) above so this assertion is not neccesary. This is to show you how to check the statusCode in the res.
+            done();
         });
 });
 ```
@@ -169,7 +163,7 @@ const router = (req, res) => {
   }
 }
 ```
-- Update your server.js file so that you are requiring in your router
+- Update your server.js file so that you are requiring in your router (this is not for the tests!)
 
 ```javascript
 const http = require('http');
@@ -184,22 +178,23 @@ http.createServer(router).listen(port, hostname, () => {
 - Run `npm test` again to validate
 - You've written your first passing test of your servers logic, congrats! Now you can build on this test by adding another test to check the response payload;
 ```javascript
-test('Home route', (t) => {
+test('Home route', done => {
+    expect.assertions(1);
     supertest(router)
         .get("/")
         .expect(200)
         .expect('Content-Type', /html/)
         .end((err, res) => {
-            t.error(err)
-            t.equal(res.text, 'Hello', 'response should contain \'Hello\'');
-            t.end();
+            if(err) return done(err);
+            expect(res.text).toBe('Hello');
+            done();
         });
 });
 ```
 
-We're using tape's `t.equal` method which takes an initial argument, a comparison argument, and a string containing a message that should describe the test, and `t.equal` will only succeed if the two arguments are equal.
+We're using jest's `expect` method which takes an initial argument and `toBe` Takes the comparison argument.`toBe` will only succeed if the two arguments are equal.
 
-Also note that we have taken out the `t.equal(res.statusCode, 200, 'Should return 200');` assertion.
+Also note that we have taken out the `expect.toBe(res.statusCode, 200);` assertion.
 
 - Run `npm test` to make sure this test fails as expected
 - Now make the test pass by adding `'Hello'` to the payload in your home route
@@ -212,9 +207,10 @@ const router = (req, res) => {
 }
 ```
 ## Next Steps
-`supertest` introduces the `expect` API, which does some of the work `tape` was doing for us (eg: `res.statusCode` assertions). The [documentation](https://www.npmjs.com/package/supertest#api) indicate that we can use `expect` for testing status codes, header fields, response body, or to pass an arbitrary function to. Combined with [tapes testing methods](https://github.com/substack/tape) you can build a robust set of tests to ensure all your server endpoints are tested.
+`supertest` introduces the `expect` API, which does some of the work `Jest` was doing for us (eg: `res.statusCode` assertions). The [documentation](https://www.npmjs.com/package/supertest#api) indicate that we can use `expect` for testing status codes, header fields, response body, or to pass an arbitrary function to. Combined with [Jest](https://jestjs.io/) you can build a robust set of tests to ensure all your server endpoints are tested.
 
 Extra notes on the `expect` API can be found [here](https://dzone.com/articles/testing-http-apis-with-supertest).
+also read about how to test asynchronys code in jest [here](https://jestjs.io/docs/en/asynchronous) 
 
 ## Exercises
 

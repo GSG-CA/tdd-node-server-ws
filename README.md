@@ -68,7 +68,7 @@ $ touch test.js
 ```javascript
 const supertest = require('supertest');
 ```
-- Write a test to ensure tape is working;
+- Write a test to ensure Jest is working;
 ```javascript
 test('Initialise', () => {
   let num = 2

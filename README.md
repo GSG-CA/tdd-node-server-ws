@@ -56,9 +56,9 @@ http.createServer().listen(port, hostname, () => {
 ```
 $ npm start
 ```
-- Install tape, tap-spec and supertest as dev dependencies
+- Install jest and supertest as dev dependencies
 ```
-$ npm install tape supertest tap-spec --save-dev
+$ npm install jest supertest --save-dev
 ```
 - Create a file to hold your tests
 ```

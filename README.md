@@ -1,4 +1,4 @@
-# Test Driven Development Server with Tape and Supertest
+# Test Driven Development Server with Jest and Supertest
  ## IMPORTANT! Do NOT clone this repo!
  Repeat: DO NOT CLONE! This whole repo IS the solution to the challenge, so please read below for further instructions :wink:
 
@@ -64,7 +64,7 @@ $ npm install tape supertest tap-spec --save-dev
 ```
 $ touch test.js
 ```
-- Inside `test.js`, require tape and supertest;
+- Inside `test.js`, require supertest;
 ```javascript
 const supertest = require('supertest');
 ```
